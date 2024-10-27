@@ -219,7 +219,7 @@ struct frontend {
     int w, h;
     midend *me;
 #ifdef USE_CAIRO
-    const float *colours;
+    float *colours;
     cairo_t *cr;
     cairo_surface_t *image;
 #ifndef USE_CAIRO_WITHOUT_PIXMAP
@@ -3988,6 +3988,7 @@ int main(int argc, char **argv)
     char *arg = NULL;
     int argtype = ARG_EITHER;
     char *screenshot_file = NULL;
+    char *palette = NULL;
     bool doing_opts = true;
     int ac = argc;
     char **av = argv;
@@ -4132,6 +4133,14 @@ int main(int argc, char **argv)
 		screenshot_file = *++av;
 	    } else {
 		fprintf(stderr, "%s: no argument supplied to '--screenshot'\n",
+			pname);
+		return 1;
+	    }
+	} else if (doing_opts && !strcmp(p, "--palette")) {
+	    if (--ac > 0) {
+		palette = *++av;
+	    } else {
+		fprintf(stderr, "%s: no argument supplied to '--palette'\n",
 			pname);
 		return 1;
 	    }
@@ -4431,6 +4440,38 @@ int main(int argc, char **argv)
 	}
 
 	if (screenshot_file) {
+        if (palette) {
+            printf("Palette:\n");
+            char *pch = strtok(palette, ",;");
+            for (int i = 0; i < fe->ncolours; i++) {
+                int r = (int)(fe->colours[3*i+0]*255);
+                int g = (int)(fe->colours[3*i+1]*255);
+                int b = (int)(fe->colours[3*i+2]*255);
+
+                int newR = r;
+                int newG = g;
+                int newB = b;
+
+                if (pch && strlen(pch) == 6) {
+                    int hexValue = (int)strtol(pch, NULL, 16);
+                    newR = ((hexValue >> 16) & 0xFF);
+                    newG = ((hexValue >> 8) & 0xFF);
+                    newB = ((hexValue) & 0xFF);
+                    fe->colours[3*i+0] = newR / 255.0;
+                    fe->colours[3*i+1] = newG / 255.0;
+                    fe->colours[3*i+2] = newB / 255.0;
+
+                    printf("%02d: \033[48;2;%d;%d;%dm   \033[0m #%02x%02x%02x -> \033[48;2;%d;%d;%dm   \033[0m #%s\n", 
+                        i, r, g, b, r, g, b,
+                        newR, newG, newB, pch);
+                } else {
+                    printf("%02d: \033[48;2;%d;%d;%dm   \033[0m #%02x%02x%02x\n", 
+                        i, r, g, b, r, g, b);
+                }
+                pch = strtok(0, ",;");
+            }
+        }
+
 	    /*
 	     * Some puzzles will not redraw their entire area if
 	     * given a partially completed animation, which means
