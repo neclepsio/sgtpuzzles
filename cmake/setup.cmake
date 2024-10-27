@@ -3,8 +3,8 @@ set(PUZZLES_ENABLE_UNFINISHED ""
 to build as if official (separated by ';')")
 
 set(build_individual_puzzles TRUE)
-set(build_cli_programs TRUE)
-set(build_gui_programs TRUE)
+set(build_cli_programs false)
+set(build_gui_programs false)
 set(build_icons FALSE)
 set(need_c_icons FALSE)
 option(BUILD_SDL_PROGRAMS "build test programs requiring SDL" FALSE)
