@@ -24,17 +24,23 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#ifndef __MINGW32__
 #include <sys/resource.h>
+#endif
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
+#ifndef __MINGW32__
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
+#else
+#define CurrentTime GDK_CURRENT_TIME
+#endif
 
 #include "puzzles.h"
 #include "gtk.h"
@@ -88,6 +94,28 @@
 #define LABEL_SAVE GTK_STOCK_SAVE
 #define LABEL_OPEN GTK_STOCK_OPEN
 #define gtk_button_new_with_our_label gtk_button_new_from_stock
+#endif
+
+#ifdef __MINGW32__
+#include <ctype.h>
+char *strcasestr(const char *s, const char *find)
+{
+  char c, sc;
+  size_t len;
+
+  if ((c = *find++) != 0) {
+    c = tolower((unsigned char)c);
+    len = strlen(find);
+    do {
+      do {
+        if ((sc = *s++) == 0)
+          return (NULL);
+      } while ((char)tolower((unsigned char)sc) != c);
+    } while (strncasecmp(s, find, len) != 0);
+    s--;
+  }
+  return ((char *)s);
+}
 #endif
 
 /* #undef USE_CAIRO */
@@ -3057,7 +3085,11 @@ static char *save_prefs(frontend *fe)
         goto out;
     }
 
+#ifndef __MINGW32__
     if (mkdir(dir_path, 0777) < 0) {
+#else
+    if (mkdir(dir_path) < 0) {
+#endif
         /* Ignore errors while trying to make the directory. It may
          * well already exist, and even if we got some error code
          * other than EEXIST, it's still worth at least _trying_ to
@@ -4191,7 +4223,9 @@ int main(int argc, char **argv)
 	while (ngenerate == 0 || i < n) {
 	    char *pstr, *seed;
             const char *err;
+#ifndef __MINGW32__            
             struct rusage before, after;
+#endif
 
 	    if (ngenerate == 0) {
 		pstr = fgetline(stdin);
@@ -4218,13 +4252,16 @@ int main(int argc, char **argv)
 		}
 	    }
 
+#ifndef __MINGW32__
             if (time_generation)
                 getrusage(RUSAGE_SELF, &before);
+#endif
 
             midend_new_game(me);
 
             seed = midend_get_random_seed(me);
 
+#ifndef __MINGW32__
             if (time_generation) {
                 double elapsed;
 
@@ -4237,6 +4274,7 @@ int main(int argc, char **argv)
 
                 printf("%s %s: %.6f\n", thegame.name, seed, elapsed);
             }
+#endif
 
             if (test_solve && thegame.can_solve) {
                 /*
