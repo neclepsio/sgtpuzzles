@@ -4449,6 +4449,15 @@ int main(int argc, char **argv)
 
 	if (screenshot_file) {
 	    save_screenshot_png(fe, screenshot_file);
+        if (soln) {
+            midend_solve(fe->me);
+    	    midend_force_redraw(fe->me);
+            char *screenshot_sol_file = malloc(strlen(screenshot_file)+100);
+            strcpy(screenshot_sol_file, screenshot_file);
+            strcat(screenshot_sol_file, "-solution.png");
+            save_screenshot_png(fe, screenshot_sol_file);
+            free(screenshot_sol_file);
+        }
 	    exit(0);
 	}
 
