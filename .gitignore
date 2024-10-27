@@ -16,6 +16,7 @@ include/
 *.ilk
 *.pdb
 /*.sln
+/gamelist.txt
 /blackbox
 /bridges
 /cube
@@ -90,6 +91,9 @@ include/
 /unruly
 /unrulysolver
 /untangle
+/fuzzpuzz
+/galaxieseditor
+/grapheditor
 /*.exe
 /*.obj
 /*.map
@@ -155,3 +159,17 @@ include/
 /unfinished/sokoban
 /unfinished/*.exe
 /*.desktop
+auxiliary/combi-test
+auxiliary/divvy-test
+auxiliary/findloop-test
+auxiliary/hat-test
+auxiliary/hatgen
+auxiliary/latin-test
+auxiliary/matching
+auxiliary/obfusc
+auxiliary/penrose-legacy-test
+auxiliary/penrose-test
+auxiliary/sort-test
+auxiliary/spectre-gen
+auxiliary/spectre-test
+auxiliary/tree234-test
