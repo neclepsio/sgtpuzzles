@@ -3443,7 +3443,7 @@ static void populate_gtk_preset_menu(frontend *fe, struct preset_menu *menu,
 enum { ARG_EITHER, ARG_SAVE, ARG_ID }; /* for argtype */
 
 static frontend *new_window(
-    char *arg, int argtype, char **error, bool headless)
+    char *arg, int argtype, char **error, bool headless, int target_size)
 {
     frontend *fe;
 #ifdef USE_PRINTING
@@ -3570,6 +3570,14 @@ static frontend *new_window(
     if (headless) {
         snaffle_colours(fe);
         get_size(fe, &fe->pw, &fe->ph);
+        if (target_size > 0) {
+            if (fe->pw > fe->ph) {
+                fe->ps = ceil((float)target_size / fe->ph);
+            } else {
+                fe->ps = ceil((float)target_size / fe->pw);
+            }
+            get_size(fe, &fe->pw, &fe->ph);
+        }
         setup_backing_store(fe);
         return fe;
     }
@@ -3974,6 +3982,7 @@ int main(int argc, char **argv)
     bool delete_prefs_action = false;
     bool soln = false, colour = false;
     float scale = 1.0F;
+    int target_size = 0;
     float redo_proportion = 0.0F;
     const char *savefile = NULL, *savesuffix = NULL;
     char *arg = NULL;
@@ -4072,6 +4081,14 @@ int main(int argc, char **argv)
 		scale = atof(*++av);
 	    } else {
 		fprintf(stderr, "%s: no argument supplied to '--scale'\n",
+			pname);
+		return 1;
+	    }
+	} else if (doing_opts && !strcmp(p, "--size")) {
+	    if (--ac > 0) {
+		target_size = atoi(*++av);
+	    } else {
+		fprintf(stderr, "%s: no argument supplied to '--size'\n",
 			pname);
 		return 1;
 	    }
@@ -4405,7 +4422,7 @@ int main(int argc, char **argv)
         if (!headless)
             gtk_init(&argc, &argv);
 
-	fe = new_window(arg, argtype, &error, headless);
+	fe = new_window(arg, argtype, &error, headless, (int)target_size);
 
 	if (!fe) {
 	    fprintf(stderr, "%s: %s\n", pname, error);
