@@ -4493,8 +4493,12 @@ int main(int argc, char **argv)
         if (soln) {
             midend_solve(fe->me);
     	    midend_force_redraw(fe->me);
-            char *screenshot_sol_file = malloc(strlen(screenshot_file)+100);
+            char *screenshot_sol_file = malloc(strlen(screenshot_file)+20);
             strcpy(screenshot_sol_file, screenshot_file);
+            char *t = strstr(screenshot_sol_file, ".png");
+            if (t != NULL) {
+                *t = 0;
+            }
             strcat(screenshot_sol_file, "-solution.png");
             save_screenshot_png(fe, screenshot_sol_file);
             free(screenshot_sol_file);
