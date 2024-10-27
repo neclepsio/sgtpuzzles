@@ -1105,7 +1105,7 @@ static void align_and_draw_text(frontend *fe,
 				const char *text)
 {
     PangoLayout *layout;
-    PangoRectangle rect;
+    PangoRectangle ink_rect, log_rect;
 
     layout = make_pango_layout(fe);
 
@@ -1114,19 +1114,23 @@ static void align_and_draw_text(frontend *fe,
      */
     pango_layout_set_font_description(layout, fe->fonts[index].desc);
     pango_layout_set_text(layout, text, strlen(text));
-    pango_layout_get_pixel_extents(layout, NULL, &rect);
+    pango_layout_get_pixel_extents(layout, &ink_rect, &log_rect);
+
+    int dx = -ink_rect.x;
+    int dy = -ink_rect.y;
 
     if (align & ALIGN_VCENTRE)
-	rect.y -= rect.height / 2;
+	    dy -= ink_rect.height / 2;
     else
-	rect.y -= rect.height;
+	    dy -= ink_rect.height;
 
+    int width = (ink_rect.width + log_rect.width) / 2;
     if (align & ALIGN_HCENTRE)
-	rect.x -= rect.width / 2;
+	    dx -= width / 2;
     else if (align & ALIGN_HRIGHT)
-	rect.x -= rect.width;
+	    dx -= width;
 
-    draw_pango_layout(fe, layout, rect.x + x, rect.y + y);
+    draw_pango_layout(fe, layout, dx + x, dy + y);
 
     g_object_unref(layout);
 }
