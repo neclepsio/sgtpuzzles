@@ -54,9 +54,9 @@ enum {
     COL_TEXT_SOLVED,
     COL_ERROR,
     COL_CURSOR,
+    COL_TEXT_DARK,
+    COL_TEXT_LIGHT,
     NCOLOURS,
-    COL_TEXT_DARK = COL_MARKED,
-    COL_TEXT_LIGHT = COL_BLANK
 };
 
 enum cell_state {
@@ -1417,6 +1417,8 @@ static float *game_colours(frontend *fe, int *ncolours)
     COLOUR(ret, COL_UNMARKED, 148 / 255.0F, 196 / 255.0F, 190 / 255.0F);
     COLOUR(ret, COL_TEXT_SOLVED, 100 / 255.0F, 100 / 255.0F, 100 / 255.0F);
     COLOUR(ret, COL_CURSOR, 255 / 255.0F, 200 / 255.0F, 200 / 255.0F);
+    COLOUR(ret, COL_TEXT_DARK, 20 / 255.0F, 20 / 255.0F, 20 / 255.0F);
+    COLOUR(ret, COL_TEXT_LIGHT, 236 / 255.0F, 236 / 255.0F, 236 / 255.0F);
 
     *ncolours = NCOLOURS;
     return ret;
