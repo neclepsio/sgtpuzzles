@@ -23,6 +23,8 @@
 
 #include "puzzles.h"
 
+#define COLOUR_BLIND
+
 /*
  * In standalone solver mode, `verbose' is a variable which can be
  * set by command-line option; in debugging mode it's simply always
@@ -2942,6 +2944,35 @@ static void draw_square(drawing *dr, game_drawstate *ds,
             }
         }
     }
+
+    #ifdef COLOUR_BLIND
+        oldj = -1;
+        for (i = 0; i < 2; i++) {
+            int mc = i ? bv : tv;
+            if (mc == FOUR) {
+                continue;
+            }
+
+            j = map->map[(i?BE:TE)*wh+y*w+x];
+            if (oldj == j)
+                continue;
+            oldj = j;
+
+            char buf[2];
+            buf[0] = 'A' + mc;
+            buf[1] = '\0';
+            
+            xo = map->regionx[j] - 2*x;
+            yo = map->regiony[j] - 2*y;
+            if (xo >= 0 && xo <= 2 && yo >= 0 && yo <= 2) {
+                draw_text(dr, (COORD(x)*2+TILESIZE*xo)/2,
+                        (COORD(y)*2+TILESIZE*yo)/2,
+                        FONT_VARIABLE, 3*TILESIZE/5,
+                        ALIGN_HCENTRE|ALIGN_VCENTRE,
+                        COL_GRID, buf);
+            }
+        }    
+    #endif
 
     unclip(dr);
 
