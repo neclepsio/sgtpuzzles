@@ -2959,7 +2959,8 @@ static void draw_square(drawing *dr, game_drawstate *ds,
             oldj = j;
 
             char buf[2];
-            buf[0] = 'A' + mc;
+            //buf[0] = 'A' + mc;
+            buf[0] = "RGBY"[mc];
             buf[1] = '\0';
             
             xo = map->regionx[j] - 2*x;
